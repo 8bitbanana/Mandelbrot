@@ -3,6 +3,9 @@
 #include <cmath>
 #include <complex>
 
+#include <chrono>
+#include <thread>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -10,11 +13,15 @@
 #include "ResourceManager.h"
 #include "Shader.h"
 
+#define DllExport __declspec(dllexport)
+
 #ifdef _WIN32
 #include <Windows.h>
+
 extern "C" {
-	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }
+
 #endif
 
 using namespace std::complex_literals;
@@ -76,7 +83,7 @@ int main(int argc, char* argv[]) {
 	GLfloat deltaTime = 0.0f;
 	GLfloat lastFrame = 0.0f;
 
-	Shader shader = ResourceManager::LoadShader("Shaders/novertex.vs.glsl", "Shaders/mandelbrot.fs.glsl", nullptr, "mandelbrot");
+	Shader shader = ResourceManager::LoadShader("Shaders/novertex.vs", "Shaders/mandelbrot.fs", nullptr, "mandelbrot");
 
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
@@ -91,13 +98,15 @@ int main(int argc, char* argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		shader.Use();
-		shader.SetInteger("iterations", 400);
+		shader.SetInteger("iterations", 800);
 		shader.SetVector2f("screenSize", current_screen_size);
 		shader.SetFloat("time", currentFrame);
 		shader.SetVector2f("user_pos", position);
 		shader.SetFloat("user_scale", scale);
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 		glfwSwapBuffers(window);
 	}
@@ -112,16 +121,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (action == GLFW_PRESS) {
 		switch (key) {
 		case GLFW_KEY_UP:
-			position.y += step;
+			position.y += step / scale*2;
 			break;
 		case GLFW_KEY_DOWN:
-			position.y -= step;
+			position.y -= step / scale*2;
 			break;
 		case GLFW_KEY_LEFT:
-			position.x -= step;
+			position.x -= step / scale*2;
 			break;
 		case GLFW_KEY_RIGHT:
-			position.x += step;
+			position.x += step / scale*2;
 			break;
 		case GLFW_KEY_Q:
 			scale -= step * 2;
@@ -144,5 +153,5 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
-	//fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s/n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s/n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 }

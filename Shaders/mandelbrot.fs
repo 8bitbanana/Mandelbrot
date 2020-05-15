@@ -23,6 +23,7 @@ int mandelbrot(vec2 c) {
 			converge_count++;
 		last_magnitude = mag;
 	}
+
 	return converge_count;
 }
 
@@ -30,9 +31,9 @@ void main() {
 	vec2 uv = gl_FragCoord.xy / screenSize;
 	//https://gamedev.stackexchange.com/questions/83853/how-to-implement-color-changing-fragment-shader
 	uv = 2.0 * uv - 1.0;
-	
-	uv += user_pos;
 	uv *= pow(1.1, -user_scale);
+	uv += user_pos;
+	
 
 	int cc = mandelbrot(uv);
 	if (float(cc)/iterations > 0.1) {

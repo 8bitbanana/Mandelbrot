@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:\\Lib\\mingw-w64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-LC:/Lib/lib",
+                "-LC:/Lib/lib/mingw-w64",
+                "-IC:/Lib/include",
+                "-g",
+                "Shader.cpp",
+                "Texture.cpp",
+                "ResourceManager.cpp",
+                "main.cpp",
+                "-lglfw3dll",
+                "-lglew32",
+                "-lopengl32",
+                "-o",
+                "build.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
